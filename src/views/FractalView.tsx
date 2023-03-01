@@ -6,6 +6,7 @@ import { ViewContainer, LogRenderer } from '@daniel.neuweiler/react-lib-module';
 import { Canvas, useFrame, ThreeElements } from '@react-three/fiber'
 
 import { ViewKeys } from './navigation';
+import { defaultFragmentShader } from './../shaders/fragmentShader';
 
 interface ILocalProps {
 }
@@ -25,6 +26,8 @@ function Box(props: ThreeElements['mesh']) {
       onPointerOver={(event) => hover(true)}
       onPointerOut={(event) => hover(false)}>
       <boxGeometry args={[1, 1, 1]} />
+      {/* <shaderMaterial
+        fragmentShader={defaultFragmentShader} /> */}
       <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
     </mesh>
   )
