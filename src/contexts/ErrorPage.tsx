@@ -17,6 +17,7 @@ export const ErrorPage: React.FC<Props> = (props) => {
   return (
 
     <Box
+      component='div'
       sx={{
         height: '100%',
         width: '100%',

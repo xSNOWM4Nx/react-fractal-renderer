@@ -48,6 +48,7 @@ const App: React.FC = () => {
     return (
 
       <Box
+        component='div' // Hack to resolve TS conflict with the "Box" component from react-three/drei -> https://github.com/pmndrs/react-three-fiber/discussions/1752
         sx={{
           height: '100vh',
           width: '100vw',

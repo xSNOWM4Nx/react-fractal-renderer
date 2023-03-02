@@ -133,7 +133,9 @@ const SettingsView: React.FC<Props> = (props) => {
 
       {renderAppSettings()}
 
-      <Box sx={{ height: (theme) => theme.spacing(1) }} />
+      <Box
+        component='div'
+        sx={{ height: (theme) => theme.spacing(1) }} />
 
       {renderMapSettings()}
     </ViewContainer>

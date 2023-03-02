@@ -1,17 +1,13 @@
 
 export const defaultFragmentShader = `
-varying vec2 vUv;
+    varying highp vec2 vTextureCoord;
+    varying highp vec3 vLighting;
 
-vec3 colorA = vec3(0.912,0.191,0.652);
-vec3 colorB = vec3(1.000,0.777,0.052);
+    uniform sampler2D uSampler;
 
-void main() {
-  // "Normalizing" with an arbitrary value
-  // We'll see a cleaner technique later :)   
-  vec2 normalizedPixel = gl_FragCoord.xy/600.0;
-  vec3 color = mix(colorA, colorB, normalizedPixel.x);
+    void main(void) {
+      highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
 
-  gl_FragColor = vec4(color,1.0);
-}
-
-`
+      gl_FragColor = vec4(texelColor.rgb * vLighting, texelColor.a);
+    }
+`;

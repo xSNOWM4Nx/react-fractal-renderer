@@ -98,6 +98,7 @@ export const RouterPage: React.FC<Props> = (props) => {
   return (
 
     <Box
+      component='div'
       sx={{
         height: '100vh',
         width: '100vw',
@@ -109,6 +110,7 @@ export const RouterPage: React.FC<Props> = (props) => {
       }}>
 
       <Box
+        component='div'
         sx={{
           overflow: 'hidden',
           flex: 'auto',
@@ -118,6 +120,7 @@ export const RouterPage: React.FC<Props> = (props) => {
         }}>
 
         <Box
+          component='div'
           sx={{
             position: 'absolute',
             top: (theme) => theme.spacing(2),

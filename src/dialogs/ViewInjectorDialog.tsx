@@ -30,12 +30,14 @@ const ViewInjectorDialog: React.FC<Props> = (props) => {
     return (
 
       <Box
+        component='div'
         sx={{
           backgroundColor: (theme) => theme.palette.primary.main,
           color: (theme) => theme.palette.primary.contrastText
         }}>
 
         <Box
+          component='div'
           sx={{
             margin: (theme) => theme.spacing(1),
             display: 'flex',
@@ -49,7 +51,9 @@ const ViewInjectorDialog: React.FC<Props> = (props) => {
             {selectedNavigationElement.display.value}
           </Typography>
 
-          <Box style={{ flex: 'auto' }} />
+          <Box
+            component='div'
+            style={{ flex: 'auto' }} />
 
           <IconButton
             color={'inherit'}
@@ -82,6 +86,7 @@ const ViewInjectorDialog: React.FC<Props> = (props) => {
       {renderHeader()}
 
       <Box
+        component='div'
         sx={{
           margin: (theme) => theme.spacing(1),
           height: '100%',

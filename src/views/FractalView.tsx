@@ -7,6 +7,7 @@ import { Canvas, useFrame, ThreeElements } from '@react-three/fiber';
 import { OrthographicCamera } from '@react-three/drei';
 
 import { ViewKeys } from './navigation';
+import { defaultVertexShader } from './../shaders/vertexShader';
 import { defaultFragmentShader } from './../shaders/fragmentShader';
 
 interface ILocalProps {
@@ -30,10 +31,11 @@ function Box(props: ThreeElements['mesh']) {
       onPointerOver={(event) => hover(true)}
       onPointerOut={(event) => hover(false)}>
       {/* <boxGeometry args={[1, 1, 1]} /> */}
-      <planeGeometry args={[2, 2]}/>
-      {/* <shaderMaterial
-        fragmentShader={defaultFragmentShader} /> */}
-      <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
+      <planeGeometry args={[2, 2]} />
+      <shaderMaterial
+        vertexShader={defaultVertexShader}
+        fragmentShader={defaultFragmentShader} />
+      {/* <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} /> */}
     </mesh>
   )
 }
