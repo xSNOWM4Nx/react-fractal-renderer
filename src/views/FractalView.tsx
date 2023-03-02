@@ -1,44 +1,117 @@
 /* eslint-disable react/react-in-jsx-scope -- Unaware of jsxImportSource */
 /** @jsxImportSource @emotion/react */
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react'
 import { LogProvider } from '@daniel.neuweiler/ts-lib-module';
 import { ViewContainer, LogRenderer } from '@daniel.neuweiler/react-lib-module';
-import { Canvas, useFrame, ThreeElements } from '@react-three/fiber';
+import { Canvas, useFrame, ThreeElements, ThreeEvent } from '@react-three/fiber';
 import { OrthographicCamera } from '@react-three/drei';
+import { Vector2, Color } from "three";
 
 import { ViewKeys } from './navigation';
 import { defaultVertexShader } from './../shaders/vertexShader';
-import { defaultFragmentShader } from './../shaders/fragmentShader';
+import { mandelbrotFragmentShader } from './../shaders/fragmentShader';
 
 interface ILocalProps {
 }
 type Props = ILocalProps;
 
-function Box(props: ThreeElements['mesh']) {
-  const ref = useRef<THREE.Mesh>(null!)
-  const [hovered, hover] = useState(false)
-  const [clicked, click] = useState(false)
+function ScreenMesh(props: ThreeElements['mesh']) {
+
+  const meshRef = useRef<THREE.Mesh>(null!);
+  const materialRef = useRef<THREE.ShaderMaterial>(null!);
+  const mousePosition = useRef({ x: 0, y: 0 });
+  const mouseDown0 = useRef(false);
+  const mouseDown1 = useRef(false);
+  const zoomSize = useRef(0);
+
+  // const updateMousePosition = useCallback((e: MouseEvent) => {
+  //   mousePosition.current = { x: e.pageX, y: e.pageY };
+  // }, []);
+
+  const handlePointerMove = (e: ThreeEvent<PointerEvent>) => {
+
+    mousePosition.current = { x: e.pageX, y: e.pageY };
+  };
+
+  const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
+
+    if (e.button === 0)
+      mouseDown0.current = true;
+    if (e.button === 1)
+      mouseDown1.current = true;
+  };
+
+  const handlePointerUp = (e: ThreeEvent<PointerEvent>) => {
+
+    if (e.button === 0)
+      mouseDown0.current = false;
+    if (e.button === 1)
+      mouseDown1.current = false;
+  };
+
+  const uniforms = useMemo(
+    () => ({
+      u_resolution: {
+        value: new Vector2(1920, 1080),
+      },
+      u_zoomCenter: {
+        value: new Vector2(0, 0),
+      },
+      u_zoomSize: {
+        value: 1.0,
+      },
+      u_maxIterations: {
+        value: 100,
+      },
+    }), []
+  );
+
+  const [hovered, hover] = useState(false);
+  const [clicked, click] = useState(false);
+
+  // useEffect(() => {
+  //   window.addEventListener("mousemove", updateMousePosition, false);
+
+  //   return () => {
+  //     window.removeEventListener("mousemove", updateMousePosition, false);
+  //   };
+  // }, [updateMousePosition]);
+
   useFrame((state, delta) => {
 
+    if (mouseDown0.current)
+      materialRef.current.uniforms.u_zoomSize.value -= .001;
+    if (mouseDown1.current)
+      materialRef.current.uniforms.u_zoomSize.value += .001;
+
+    // materialRef.current.uniforms.u_zoomCenter.value = new Vector2(
+    //   mousePosition.current.x,
+    //   mousePosition.current.y)
+
     // (ref.current.rotation.x += delta)
-  })
+  });
+
   return (
+
     <mesh
       {...props}
-      ref={ref}
+      ref={meshRef}
       // scale={clicked ? 1.5 : 1}
       onClick={(event) => click(!clicked)}
+      onPointerMove={handlePointerMove}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
       onPointerOver={(event) => hover(true)}
       onPointerOut={(event) => hover(false)}>
-      {/* <boxGeometry args={[1, 1, 1]} /> */}
+
       <planeGeometry args={[2, 2]} />
       <shaderMaterial
-        vertexShader={defaultVertexShader}
-        fragmentShader={defaultFragmentShader} />
-      {/* <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} /> */}
+        ref={materialRef}
+        uniforms={uniforms}
+        fragmentShader={mandelbrotFragmentShader}/> 
     </mesh>
-  )
-}
+  );
+};
 
 const FractalViewMemoized: React.FC<Props> = (props) => {
 
@@ -68,7 +141,7 @@ const FractalViewMemoized: React.FC<Props> = (props) => {
 
           <ambientLight />
           {/* <pointLight position={[10, 10, 10]} /> */}
-          <Box />
+          <ScreenMesh />
 
         </Canvas>
       </div>
