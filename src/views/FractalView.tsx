@@ -2,10 +2,10 @@
 /** @jsxImportSource @emotion/react */
 import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react'
 import { LogProvider } from '@daniel.neuweiler/ts-lib-module';
-import { ViewContainer, LogRenderer } from '@daniel.neuweiler/react-lib-module';
-import { Canvas, useFrame, ThreeElements, ThreeEvent } from '@react-three/fiber';
+import { ViewContainer, AutoSizeContainer } from '@daniel.neuweiler/react-lib-module';
+import { Canvas, useFrame, useThree, ThreeElements, ThreeEvent } from '@react-three/fiber';
 import { OrthographicCamera } from '@react-three/drei';
-import { Vector2, Color } from "three";
+import { Vector2, Vector3 } from "three";
 
 import { ViewKeys } from './navigation';
 import { defaultVertexShader } from './../shaders/vertexShader';
@@ -17,16 +17,22 @@ type Props = ILocalProps;
 
 function ScreenMesh(props: ThreeElements['mesh']) {
 
+  const { camera, gl } = useThree();
+
   const meshRef = useRef<THREE.Mesh>(null!);
   const materialRef = useRef<THREE.ShaderMaterial>(null!);
-  const mousePosition = useRef({ x: 0, y: 0 });
+
+  const screenSize = useRef<Vector2>(new Vector2(window.innerWidth, window.innerHeight));
   const mouseDown0 = useRef(false);
   const mouseDown1 = useRef(false);
-  const zoomSize = useRef(0);
+  const mousePosition = useRef({ x: 0, y: 0 });
 
-  // const updateMousePosition = useCallback((e: MouseEvent) => {
-  //   mousePosition.current = { x: e.pageX, y: e.pageY };
-  // }, []);
+  const updateScreenSize = useCallback(() => {
+    screenSize.current = new Vector2(window.innerWidth, window.innerHeight);
+  }, []);
+  const updateMousePosition = useCallback((e: MouseEvent) => {
+    mousePosition.current = { x: e.x, y: e.y };
+  }, []);
 
   const handlePointerMove = (e: ThreeEvent<PointerEvent>) => {
 
@@ -51,14 +57,26 @@ function ScreenMesh(props: ThreeElements['mesh']) {
 
   const uniforms = useMemo(
     () => ({
-      u_resolution: {
-        value: new Vector2(1920, 1080),
+      res: {
+        value: new Vector2(window.innerWidth, window.innerHeight),
+      },
+      aspect: {
+        value: window.innerWidth / window.innerHeight,
+      },
+      zoom: {
+        value: 1,
+      },
+      offset: {
+        value: new Vector2(-1, -1),
+      },
+      pset1: {
+        value: new Vector3(1, 1, 1),
+      },
+      pset2: {
+        value: new Vector3(1, 1, 1),
       },
       u_zoomCenter: {
         value: new Vector2(0, 0),
-      },
-      u_zoomSize: {
-        value: 1.0,
       },
       u_maxIterations: {
         value: 100,
@@ -69,24 +87,35 @@ function ScreenMesh(props: ThreeElements['mesh']) {
   const [hovered, hover] = useState(false);
   const [clicked, click] = useState(false);
 
-  // useEffect(() => {
-  //   window.addEventListener("mousemove", updateMousePosition, false);
+  useEffect(() => {
+    window.addEventListener("resize", updateScreenSize, false);
 
-  //   return () => {
-  //     window.removeEventListener("mousemove", updateMousePosition, false);
-  //   };
-  // }, [updateMousePosition]);
+    return () => {
+      window.removeEventListener("resize", updateScreenSize, false);
+    };
+  }, [updateScreenSize]);
+  useEffect(() => {
+    window.addEventListener("mousemove", updateMousePosition, false);
+
+    return () => {
+      window.removeEventListener("mousemove", updateMousePosition, false);
+    };
+  }, [updateMousePosition]);
 
   useFrame((state, delta) => {
 
-    if (mouseDown0.current)
-      materialRef.current.uniforms.u_zoomSize.value -= .001;
-    if (mouseDown1.current)
-      materialRef.current.uniforms.u_zoomSize.value += .001;
+    materialRef.current.uniforms.res.value = screenSize.current;
+    materialRef.current.uniforms.aspect.value = screenSize.current.x / screenSize.current.y;
 
-    // materialRef.current.uniforms.u_zoomCenter.value = new Vector2(
-    //   mousePosition.current.x,
-    //   mousePosition.current.y)
+    if (mouseDown0.current)
+      materialRef.current.uniforms.zoom.value -= .01;
+    if (mouseDown1.current)
+      materialRef.current.uniforms.zoom.value += .01;
+
+    // if (mouseDown0.current)
+    //   materialRef.current.uniforms.offset.value = new Vector2(
+    //     mousePosition.current.x,
+    //     mousePosition.current.y)
 
     // (ref.current.rotation.x += delta)
   });
@@ -98,7 +127,7 @@ function ScreenMesh(props: ThreeElements['mesh']) {
       ref={meshRef}
       // scale={clicked ? 1.5 : 1}
       onClick={(event) => click(!clicked)}
-      onPointerMove={handlePointerMove}
+      // onPointerMove={handlePointerMove}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerOver={(event) => hover(true)}
@@ -108,8 +137,9 @@ function ScreenMesh(props: ThreeElements['mesh']) {
       <shaderMaterial
         ref={materialRef}
         uniforms={uniforms}
-        fragmentShader={mandelbrotFragmentShader}/> 
+        fragmentShader={mandelbrotFragmentShader} />
     </mesh>
+
   );
 };
 
@@ -120,16 +150,12 @@ const FractalViewMemoized: React.FC<Props> = (props) => {
 
   return (
 
-    <ViewContainer
-      isScrollLocked={false}>
-
-      <div
-        id="canvas-container"
-        css={(theme) => ({
-          height: '100%'
-        })}>
+    <AutoSizeContainer
+      isScrollLocked={false}
+      onRenderSizedChild={(height, width) =>
 
         <Canvas>
+
           <OrthographicCamera
             makeDefault
             left={-1}
@@ -138,15 +164,12 @@ const FractalViewMemoized: React.FC<Props> = (props) => {
             bottom={-1}
             near={-1}
             far={1} />
-
           <ambientLight />
           {/* <pointLight position={[10, 10, 10]} /> */}
           <ScreenMesh />
 
         </Canvas>
-      </div>
-
-    </ViewContainer>
+      } />
   );
 }
 
