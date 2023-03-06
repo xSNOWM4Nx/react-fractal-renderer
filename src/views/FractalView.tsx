@@ -28,15 +28,20 @@ function ScreenMesh(props: ThreeElements['mesh']) {
   const mousePosition = useRef({ x: 0, y: 0 });
 
   const updateScreenSize = useCallback(() => {
-    screenSize.current = new Vector2(window.innerWidth, window.innerHeight);
+
+    //screenSize.current = new Vector2(window.innerWidth, window.innerHeight);
+    uniforms.res.value = new Vector2(window.innerWidth, window.innerHeight);
+    uniforms.aspect.value = window.innerWidth / window.innerHeight;
+
   }, []);
   const updateMousePosition = useCallback((e: MouseEvent) => {
-    mousePosition.current = { x: e.x, y: e.y };
+
+    mousePosition.current = { x: e.clientX, y: e.clientY };
   }, []);
 
   const handlePointerMove = (e: ThreeEvent<PointerEvent>) => {
 
-    mousePosition.current = { x: e.pageX, y: e.pageY };
+    mousePosition.current = { x: e.clientX, y: e.clientY };
   };
 
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
@@ -64,16 +69,16 @@ function ScreenMesh(props: ThreeElements['mesh']) {
         value: window.innerWidth / window.innerHeight,
       },
       zoom: {
-        value: 1,
+        value: 3,
       },
       offset: {
-        value: new Vector2(-1, -1),
+        value: (window.innerWidth / window.innerHeight) > 1 ? new Vector2(-3, -1.5) : new Vector2(-1.5, -3),
       },
       pset1: {
-        value: new Vector3(1, 1, 1),
+        value: new Vector3(1, .01, .01),
       },
       pset2: {
-        value: new Vector3(1, 1, 1),
+        value: new Vector3(.01, .01, .01),
       },
       u_zoomCenter: {
         value: new Vector2(0, 0),
@@ -104,13 +109,32 @@ function ScreenMesh(props: ThreeElements['mesh']) {
 
   useFrame((state, delta) => {
 
-    materialRef.current.uniforms.res.value = screenSize.current;
-    materialRef.current.uniforms.aspect.value = screenSize.current.x / screenSize.current.y;
+    //materialRef.current.uniforms.res.value = screenSize.current;
+    //materialRef.current.uniforms.aspect.value = screenSize.current.x / screenSize.current.y;
 
+    //var aspect = materialRef.current.uniforms.aspect.value;
+
+    var zoom = materialRef.current.uniforms.zoom.value as number;
     if (mouseDown0.current)
-      materialRef.current.uniforms.zoom.value -= .01;
+      zoom -= .01;
     if (mouseDown1.current)
-      materialRef.current.uniforms.zoom.value += .01;
+      zoom += .01;
+
+    if (mouseDown0.current ||
+      mouseDown1.current) {
+
+      var zoom1 = zoom - materialRef.current.uniforms.zoom.value;
+      //var mouseX = mousePosition.current.x / window.innerWidth;
+      var mouseX = (mousePosition.current.x * (2 * zoom)) / window.innerWidth;
+
+      var mouseY = 1 - mousePosition.current.y / window.innerHeight;
+      var offset = new Vector2(-mouseX, -(zoom / 2));
+      //var offset = new Vector2(-mouseX * zoom * materialRef.current.uniforms.aspect.value, -mouseY * zoom);
+
+      materialRef.current.uniforms.zoom.value = zoom;
+      materialRef.current.uniforms.offset.value = offset;
+    }
+
 
     // if (mouseDown0.current)
     //   materialRef.current.uniforms.offset.value = new Vector2(
