@@ -9,7 +9,7 @@ import { Vector2, Vector3 } from "three";
 
 import { ViewKeys } from './navigation';
 import { default_VertexShader } from './../shaders/vertexShader';
-import { mandelbrot_FragmentShader } from './../shaders/fragmentShader';
+import { mandelbrot_FragmentShader, mandelbrot_2_FragmentShader } from './../shaders/fragmentShader';
 
 interface ILocalProps {
 }
@@ -17,8 +17,8 @@ type Props = ILocalProps;
 
 function ScreenMesh(props: ThreeElements['mesh']) {
 
-  const startZoom = 3;
-  const zoomSpeed = .05;
+  const startZoom = 2;
+  const zoomSpeed = 1;
 
   // useState
   const [hovered, hover] = useState(false);
@@ -31,12 +31,57 @@ function ScreenMesh(props: ThreeElements['mesh']) {
   const mouseDown1 = useRef(false);
   const mousePosition = useRef({ x: 0, y: 0 });
 
+  const getWindowSize = () => {
+    return new Vector2(window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio);
+  };
+
+  const getAspectRatio = () => {
+
+    const windowSize = getWindowSize();
+    return windowSize.x / windowSize.y;
+  };
+
+  const uniforms = useMemo(
+    () => ({
+      u_resolution: {
+        value: getWindowSize(),
+      },
+      u_aspectRatio: {
+        value: getAspectRatio()
+      },
+      u_zoomSize: {
+        value: startZoom,
+      },
+      u_offset: {
+        value: new Vector2(-(startZoom / 2) * getAspectRatio(), -(startZoom / 2)),
+      },
+      u_maxIterations: {
+        value: 200,
+      },
+      u_baseColor: {
+        value: new Vector3(0.1, 0.1, 0.1),
+      },
+      u_color1: {
+        value: new Vector3(0.2, 0.2, 0.2),
+      },
+      u_color2: {
+        value: new Vector3(0.129, 0.588, 0.953),
+      },
+      pset1: {
+        value: new Vector3(1, .01, .01),
+      },
+      pset2: {
+        value: new Vector3(.01, .01, .01),
+      },
+    }), []
+  );
+
   // useCallback
   const updateScreenSize = useCallback(() => {
 
-    uniforms.u_resolution.value = new Vector2(window.innerWidth, window.innerHeight);
-    uniforms.u_aspectRatio.value = window.innerWidth / window.innerHeight;
-
+    const windowSize = getWindowSize();
+    uniforms.u_resolution.value = windowSize;
+    uniforms.u_aspectRatio.value = windowSize.x / windowSize.y;
   }, []);
   const updateMousePosition = useCallback((e: MouseEvent) => {
 
@@ -80,44 +125,6 @@ function ScreenMesh(props: ThreeElements['mesh']) {
       mouseDown1.current = false;
   };
 
-  const getStartOffset = () => {
-
-    var aspectRatio = window.innerWidth / window.innerHeight;
-    if (aspectRatio > 1)
-      return new Vector2(-startZoom, -(startZoom / 2));
-    else
-      return new Vector2(-(startZoom / 2) - 0.8, -startZoom);
-  };
-
-  const uniforms = useMemo(
-    () => ({
-      u_resolution: {
-        value: new Vector2(window.innerWidth, window.innerHeight),
-      },
-      u_aspectRatio: {
-        value: window.innerWidth / window.innerHeight,
-      },
-      u_zoomSize: {
-        value: startZoom,
-      },
-      u_offset: {
-        value: getStartOffset(),
-      },
-      u_zoomCenter: {
-        value: new Vector2(0, -1.5),
-      },
-      u_maxIterations: {
-        value: 200,
-      },
-      pset1: {
-        value: new Vector3(1, .01, .01),
-      },
-      pset2: {
-        value: new Vector3(.01, .01, .01),
-      },
-    }), []
-  );
-
   // useFrame
   useFrame((state, delta) => {
 
@@ -125,9 +132,9 @@ function ScreenMesh(props: ThreeElements['mesh']) {
     var offset = materialRef.current.uniforms.u_offset.value as Vector2;
 
     if (mouseDown0.current)
-      zoom *= 1 - zoomSpeed;
+      zoom *= 1 - zoomSpeed * delta;
     if (mouseDown1.current)
-      zoom *= 1 + zoomSpeed;
+      zoom *= 1 + zoomSpeed * delta;
 
     if (mouseDown0.current ||
       mouseDown1.current) {
@@ -171,11 +178,6 @@ const FractalViewMemoized: React.FC<Props> = (props) => {
   // Fields
   const contextName: string = ViewKeys.FractalView
 
-  // useRef
-  // const cameraRef = useRef<THREE.OrthographicCamera>(null!);
-  // if (cameraRef.current !== null)
-  //   cameraRef.current.updateProjectionMatrix()
-
   return (
 
     <AutoSizeContainer
@@ -188,7 +190,6 @@ const FractalViewMemoized: React.FC<Props> = (props) => {
           }}>
 
           {/* <OrthographicCamera
-            ref={cameraRef}
             makeDefault
             left={-1}
             right={1}
@@ -197,7 +198,6 @@ const FractalViewMemoized: React.FC<Props> = (props) => {
             near={-1}
             far={1} /> */}
           <ambientLight />
-          {/* <pointLight position={[10, 10, 10]} /> */}
           <ScreenMesh />
 
         </Canvas>

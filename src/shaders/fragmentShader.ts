@@ -21,6 +21,10 @@ uniform vec2 u_offset; // the center of the view
 uniform float u_zoomSize; // the scale of the view
 uniform float u_maxIterations; // the maximum number of iterations
 
+uniform vec3 u_baseColor;
+uniform vec3 u_color1;
+uniform vec3 u_color2;
+
 void main() {
 
   // map the pixel coordinates to the complex plane
@@ -39,12 +43,12 @@ void main() {
   }
 
   // calculate the color based on the number of iterations
-  vec3 color = vec3(0.1); // black by default
+  vec3 color = u_baseColor;
   if (n < u_maxIterations) {
 
     // use a palette based on the normalized iteration count
     float t = n / u_maxIterations; // the normalized iteration count
-    color = mix(vec3(0.2, 0.2, 0.2), vec3(0.129, 0.588, 0.953), t); // a blue-yellow gradient
+    color = mix(u_color1, u_color2, t); // a blue-yellow gradient
   }
 
   // output the color
@@ -67,7 +71,7 @@ uniform vec3 pset1;
 uniform vec3 pset2;
 
 // Complex number multiplication
-dvec2 cm (vec2 a, vec2 b){
+vec2 cm (vec2 a, vec2 b){
   return vec2(a.x*b.x - a.y*b.y, a.x*b.y + b.x*a.y);
 }
 
