@@ -1,5 +1,5 @@
 
-export const defaultVertexShader = `
+export const default_VertexShader = `
 attribute vec4 aVertexPosition;
 attribute vec3 aVertexNormal;
 attribute vec2 aTextureCoord;
