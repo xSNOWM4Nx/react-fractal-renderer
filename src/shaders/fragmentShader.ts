@@ -27,11 +27,11 @@ uniform vec3 u_color2;
 
 void main() {
 
-  // map the pixel coordinates to the complex plane
+  // Map the pixel coordinates to the complex plane
   vec2 z = u_zoomSize * vec2(u_aspectRatio, 1.0) * gl_FragCoord.xy / u_resolution + u_offset;
   vec2 c = z; // the initial value of c
 
-  // iterate the function z = z^2 + c
+  // Iterate the function z = z^2 + c
   float n = 0.0; // the number of iterations
   for (int i = 0; i < 1000; i++) {
 
@@ -42,16 +42,74 @@ void main() {
     n++; // increment the number of iterations
   }
 
-  // calculate the color based on the number of iterations
+  // Calculate the color based on the number of iterations
   vec3 color = u_baseColor;
   if (n < u_maxIterations) {
 
-    // use a palette based on the normalized iteration count
+    // Use a palette based on the normalized iteration count
     float t = n / u_maxIterations; // the normalized iteration count
-    color = mix(u_color1, u_color2, t); // a blue-yellow gradient
+    color = mix(u_color1, u_color2, t);
   }
 
-  // output the color
+  // Output the color
+  gl_FragColor = vec4(color, 1.0);
+}
+`;
+
+export const julia_FragmentShader = `
+precision highp float;
+
+uniform vec2 u_resolution; // the size of the canvas
+uniform float u_aspectRatio;
+uniform vec2 u_offset; // the center of the view
+uniform float u_zoomSize; // the scale of the view
+uniform float u_maxIterations; // the maximum number of iterations
+
+uniform vec2 u_JuliaC; // The parameter of the Julia set function
+
+uniform vec3 u_baseColor;
+uniform vec3 u_color1;
+uniform vec3 u_color2;
+
+// Returns the number of iterations for a given point z
+int julia(vec2 z) {
+
+  int n = 0;
+  for (int i = 0; i < 1000; i++) {
+
+    if (float(n) >= u_maxIterations) break; // stop if reached the limit
+
+    z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + u_JuliaC;
+    if (length(z) >= 4.0) break; // stop if escaped the circle
+    
+    n++; // increment the number of iterations
+  }
+
+  return n;
+}
+
+// Main function that sets the color of each pixel
+void main() {
+
+  // Map the pixel coordinates to the complex plane
+  vec2 z = u_zoomSize * vec2(u_aspectRatio, 1.0) * gl_FragCoord.xy / u_resolution + u_offset;
+  
+  // Get the number of iterations for this point
+  int n = julia(z);
+  
+  // Map the number of iterations to a color using a gradient
+  //vec3 color = mix(vec3(1.0), vec3(0.0), float(n) / u_maxIterations);
+
+    // Calculate the color based on the number of iterations
+  vec3 color = u_baseColor;
+  if (float(n) < u_maxIterations) {
+
+    // Use a palette based on the normalized iteration count
+    float t = float(n) / u_maxIterations; // the normalized iteration count
+    color = mix(u_color1, u_color2, t);
+  }
+
+  // Output the color
   gl_FragColor = vec4(color, 1.0);
 }
 `;

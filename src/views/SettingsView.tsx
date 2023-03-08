@@ -2,13 +2,9 @@ import React, { useContext } from 'react';
 import { Box, Typography, Card, CardContent, FormGroup, FormControl, FormControlLabel, InputLabel, Switch, Select, SelectChangeEvent, MenuItem } from '@mui/material';
 import { SystemContext, ViewContainer } from '@daniel.neuweiler/react-lib-module';
 import { AppContext } from './../contexts';
-import { ViewKeys } from './navigation';
+import { ViewKeys, SettingKeys } from './navigation';
 import { ThemeKeys } from './../styles';
-
-export class SettingKeys {
-  public static ShowDataOverlayOnMap = 'ShowDataOverlayOnMap';
-  public static ShowLogOverlayOnMap = 'ShowLogOverlayOnMap';
-};
+import { FractalKeys } from './../fractals';
 
 interface ILocalProps {
 }
@@ -29,15 +25,18 @@ const SettingsView: React.FC<Props> = (props) => {
     if (typeof (value) === type)
       return value;
 
-    return false;
+    if (type === 'boolean')
+      return false;
+    if (type === 'string')
+      return '';
   };
 
   const handleChange = (e: SelectChangeEvent) => {
     appContext.changeTheme(e.target.value);
   };
 
-  const handleSettingsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    systemContext.storeSetting(e.target.name, e.target.checked);
+  const handleFractalChange = (e: SelectChangeEvent) => {
+    systemContext.storeSetting(SettingKeys.FractalKey, e.target.value);
   };
 
   const renderAppSettings = () => {
@@ -60,12 +59,12 @@ const SettingsView: React.FC<Props> = (props) => {
               sx={{ m: 1, minWidth: 120 }}>
 
               <InputLabel
-                id="demo-simple-select-filled-label">
+                id="theme-change-label-filled">
                 Theme change
               </InputLabel>
               <Select
-                labelId="demo-simple-select-filled-label"
-                id="demo-simple-select-filled"
+                labelId="theme-change-label-filled"
+                id="theme-change-select-filled"
                 value={appContext.activeThemeName}
                 onChange={handleChange}>
 
@@ -86,7 +85,9 @@ const SettingsView: React.FC<Props> = (props) => {
     );
   };
 
-  const renderMapSettings = () => {
+  const renderFractalSettings = () => {
+
+    const selectedFractalKey = getSetting(SettingKeys.FractalKey, 'string');
 
     return (
       <Card>
@@ -96,30 +97,36 @@ const SettingsView: React.FC<Props> = (props) => {
           <Typography
             variant={'h6'}
             gutterBottom={true}>
-            {'Map settings'}
+            {'Fractal settings'}
           </Typography>
 
           <FormGroup>
-            <FormControlLabel
-              control={
-                <Switch
-                  color='secondary'
-                  name={SettingKeys.ShowDataOverlayOnMap}
-                  checked={getSetting(SettingKeys.ShowDataOverlayOnMap, 'boolean')}
-                  onChange={handleSettingsChange} />
-              }
-              label="Show data overlay on map"
-            />
-            <FormControlLabel
-              control={
-                <Switch
-                  color='secondary'
-                  name={SettingKeys.ShowLogOverlayOnMap}
-                  checked={getSetting(SettingKeys.ShowLogOverlayOnMap, 'boolean')}
-                  onChange={handleSettingsChange} />
-              }
-              label="Show log overlay on map"
-            />
+            <FormControl
+              color='secondary'
+              variant="filled"
+              sx={{ m: 1, minWidth: 120 }}>
+
+              <InputLabel
+                id="fractal-change-label-filled">
+                Fractal change
+              </InputLabel>
+              <Select
+                labelId="fractal-change-label-filled"
+                id="fractal-change-select-filled"
+                value={selectedFractalKey === '' ? FractalKeys.MandelbrotSet : selectedFractalKey}
+                onChange={handleFractalChange}>
+
+                <MenuItem
+                  value={FractalKeys.MandelbrotSet}>
+                  {FractalKeys.MandelbrotSet}
+                </MenuItem>
+                <MenuItem
+                  value={FractalKeys.JuliaSet}>
+                  {FractalKeys.JuliaSet}
+                </MenuItem>
+              </Select>
+            </FormControl>
+
           </FormGroup>
         </CardContent>
       </Card>
@@ -137,7 +144,7 @@ const SettingsView: React.FC<Props> = (props) => {
         component='div'
         sx={{ height: (theme) => theme.spacing(1) }} />
 
-      {renderMapSettings()}
+      {renderFractalSettings()}
     </ViewContainer>
   );
 }
