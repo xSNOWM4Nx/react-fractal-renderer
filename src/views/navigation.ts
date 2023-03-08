@@ -6,10 +6,6 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import CodeIcon from '@mui/icons-material/Code';
 import InfoIcon from '@mui/icons-material/Info';
 
-export class SettingKeys {
-  public static FractalKey = 'FractalKey';
-};
-
 export class ViewKeys {
 
   public static ErrorView: string = 'ErrorView';

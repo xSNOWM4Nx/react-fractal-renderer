@@ -4,9 +4,10 @@ import React, { useContext } from 'react'
 import { SystemContext, AutoSizeContainer } from '@daniel.neuweiler/react-lib-module';
 import { Canvas } from '@react-three/fiber';
 import { OrthographicCamera } from '@react-three/drei';
+import { Box } from '@mui/material';
 
-import { ViewKeys, SettingKeys } from './navigation';
-import { MandelbrotThreeMesh, JuliaThreeMesh, FractalKeys } from './../fractals';
+import { ViewKeys } from './navigation';
+import { MandelbrotThreeMesh, JuliaThreeMesh, FractalSettingsOverlay, FractalKeys, FractalSettingKeys } from './../fractals';
 
 interface ILocalProps {
 }
@@ -20,35 +21,60 @@ const FractalViewMemoized: React.FC<Props> = (props) => {
   // Contexts
   const systemContext = useContext(SystemContext);
 
-  var fractalKey = systemContext.getSetting(SettingKeys.FractalKey) as string;
+  var fractalKey = systemContext.getSetting(FractalSettingKeys.FractalKey) as string;
   if (fractalKey === undefined || fractalKey === '')
     fractalKey = FractalKeys.MandelbrotSet;
 
+  var juliaR = systemContext.getSetting(FractalSettingKeys.JuliaSetR) as number;
+  if (juliaR === undefined || juliaR === 0)
+    juliaR = -0.8
+  var juliaI = systemContext.getSetting(FractalSettingKeys.JuliaSetI) as number;
+  if (juliaI === undefined || juliaI === 0)
+    juliaI = 0.156
+
   return (
 
-    <AutoSizeContainer
-      isScrollLocked={false}
-      onRenderSizedChild={(height, width) =>
+    <React.Fragment>
+      <AutoSizeContainer
+        isScrollLocked={false}
+        onRenderSizedChild={(height, width) =>
 
-        <Canvas
-          camera={{
-            fov: 10
-          }}>
+          <Canvas
+            camera={{
+              fov: 10
+            }}>
 
-          {/* <OrthographicCamera
-            makeDefault
-            left={-1}
-            right={1}
-            top={1}
-            bottom={-1}
-            near={-1}
-            far={1} /> */}
-          <ambientLight />
-          {fractalKey === FractalKeys.MandelbrotSet && <MandelbrotThreeMesh />}
-          {fractalKey === FractalKeys.JuliaSet && <JuliaThreeMesh />}
+            {/* <OrthographicCamera
+              makeDefault
+              left={-1}
+              right={1}
+              top={1}
+              bottom={-1}
+              near={-1}
+              far={1} /> */}
+            <ambientLight />
+            {fractalKey === FractalKeys.MandelbrotSet && <MandelbrotThreeMesh />}
+            {fractalKey === FractalKeys.JuliaSet &&
+            <JuliaThreeMesh
+              r={juliaR}
+              i={juliaI}/>}
 
-        </Canvas>
-      } />
+          </Canvas>
+        } />
+
+      <Box
+        component='div'
+        sx={{
+          position: 'absolute',
+          bottom: 48,
+          left: 0,
+          padding: '10px'
+        }}>
+
+        <FractalSettingsOverlay />
+      </Box>
+
+    </React.Fragment>
   );
 }
 

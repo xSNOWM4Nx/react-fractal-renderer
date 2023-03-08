@@ -24,6 +24,18 @@ uniform float u_maxIterations; // the maximum number of iterations
 uniform vec3 u_baseColor;
 uniform vec3 u_color1;
 uniform vec3 u_color2;
+uniform vec3 u_color3;
+uniform vec3 u_color4;
+uniform vec3 u_color5;
+
+vec3 palette(float t, vec3 c1, vec3 c2, vec3 c3, vec3 c4, vec3 c5) {
+  float x = 1.0 / 4.0;
+  if (t < x) return mix(c1, c2, t/x);
+  else if (t < 2.0 * x) return mix(c2, c3, (t - x)/x);
+  else if (t < 3.0 * x) return mix(c3, c4, (t - 2.0*x)/x);
+  else if (t < 4.0 * x) return mix(c4, c5, (t - 3.0*x)/x);
+  return c5;
+}
 
 void main() {
 
@@ -48,7 +60,9 @@ void main() {
 
     // Use a palette based on the normalized iteration count
     float t = n / u_maxIterations; // the normalized iteration count
-    color = mix(u_color1, u_color2, t);
+
+    //color = mix(u_color1, u_color2, t);
+    color = palette(t, u_color1, u_color2, u_color3, u_color4, u_color5);
   }
 
   // Output the color
@@ -70,6 +84,18 @@ uniform vec2 u_JuliaC; // The parameter of the Julia set function
 uniform vec3 u_baseColor;
 uniform vec3 u_color1;
 uniform vec3 u_color2;
+uniform vec3 u_color3;
+uniform vec3 u_color4;
+uniform vec3 u_color5;
+
+vec3 palette(float t, vec3 c1, vec3 c2, vec3 c3, vec3 c4, vec3 c5) {
+  float x = 1.0 / 4.0;
+  if (t < x) return mix(c1, c2, t/x);
+  else if (t < 2.0 * x) return mix(c2, c3, (t - x)/x);
+  else if (t < 3.0 * x) return mix(c3, c4, (t - 2.0*x)/x);
+  else if (t < 4.0 * x) return mix(c4, c5, (t - 3.0*x)/x);
+  return c5;
+}
 
 // Returns the number of iterations for a given point z
 int julia(vec2 z) {
@@ -106,7 +132,9 @@ void main() {
 
     // Use a palette based on the normalized iteration count
     float t = float(n) / u_maxIterations; // the normalized iteration count
-    color = mix(u_color1, u_color2, t);
+
+    //color = mix(u_color1, u_color2, t);
+    color = palette(t, u_color1, u_color2, u_color3, u_color4, u_color5);
   }
 
   // Output the color

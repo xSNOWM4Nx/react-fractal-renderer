@@ -2,10 +2,12 @@ import { useRef, useState, useEffect, useMemo, useCallback } from 'react'
 import { useFrame, ThreeEvent } from '@react-three/fiber';
 import { Vector2, Vector3 } from "three";
 
-import { getDefaultUnifroms, getWindowSize } from './renderingHelpers';
+import { getDefaultUnifroms, getWindowSize, hexToVec3 } from './renderingHelpers';
 import { julia_FragmentShader } from './../shaders/fragmentShader';
 
 interface ILocalProps {
+  r: number;
+  i: number
 }
 type Props = ILocalProps;
 
@@ -23,13 +25,18 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
   const materialRef = useRef<THREE.ShaderMaterial>(null!);
   const mouseDown0 = useRef(false);
   const mouseDown1 = useRef(false);
+  const mouseDown2 = useRef(false);
+  const isQPressed = useRef(false);
+  const isAPressed = useRef(false);
+  const isCtrlPressed = useRef(false);
   const mousePosition = useRef({ x: 0, y: 0 });
+  const mouseDelta = useRef({ x: 0.0, y: 0.0 });
 
   const uniforms = useMemo(
     () => ({
       ...getDefaultUnifroms(startZoom),
       u_JuliaC: {
-        value: new Vector2(-0.8, 0.156), // (-0.4, 0.6), (0.285, 0), (-0.8, 0.156)
+        value: new Vector2(props.r, props.i), // (-0.4, 0.6), (0.285, 0), (-0.8, 0.156)
       },
       u_baseColor: {
         value: new Vector3(0.15, 0.15, 0.15),
@@ -38,7 +45,16 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
         value: new Vector3(0.2, 0.2, 0.2),
       },
       u_color2: {
-        value: new Vector3(0.129, 0.588, 0.953),
+        value: hexToVec3('#90caf9'),
+      },
+      u_color3: {
+        value: hexToVec3('#80deea'),
+      },
+      u_color4: {
+        value: hexToVec3('#2196f3'),
+      },
+      u_color5: {
+        value: hexToVec3('#64b5f6'),
       }
     }), []
   );
@@ -53,6 +69,27 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
   const updateMousePosition = useCallback((e: MouseEvent) => {
 
     mousePosition.current = { x: e.clientX, y: e.clientY };
+    mouseDelta.current = { x: e.movementX, y: e.movementY };
+  }, []);
+  const updateKeyDown = useCallback((e: KeyboardEvent) => {
+
+    if (e.code === "KeyQ")
+      isQPressed.current = true;
+    if (e.code === "KeyA")
+      isAPressed.current = true;
+    if (e.code === "ControlLeft")
+      isCtrlPressed.current = true;
+  
+  }, []);
+  const updateKeyUp = useCallback((e: KeyboardEvent) => {
+
+    if (e.code === "KeyQ")
+      isQPressed.current = false;
+    if (e.code === "KeyA")
+      isAPressed.current = false;
+    if (e.code === "ControlLeft")
+      isCtrlPressed.current = false;
+  
   }, []);
 
   // useEffects
@@ -70,12 +107,28 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
       window.removeEventListener("mousemove", updateMousePosition, false);
     };
   }, [updateMousePosition]);
+  useEffect(() => {
+    window.addEventListener("keydown", updateKeyDown, false);
+
+    return () => {
+      window.removeEventListener("keydown", updateKeyDown, false);
+    };
+  }, [updateKeyDown]);
+  useEffect(() => {
+    window.addEventListener("keyup", updateKeyUp, false);
+
+    return () => {
+      window.removeEventListener("keyup", updateKeyUp, false);
+    };
+  }, [updateKeyUp]);
 
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
 
     if (e.button === 0)
       mouseDown0.current = true;
     if (e.button === 1)
+      mouseDown1.current = true;
+    if (e.button === 2)
       mouseDown1.current = true;
   };
 
@@ -85,6 +138,8 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
       mouseDown0.current = false;
     if (e.button === 1)
       mouseDown1.current = false;
+    if (e.button === 2)
+      mouseDown1.current = false;
   };
 
   // useFrame
@@ -93,13 +148,13 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
     var zoom = materialRef.current.uniforms.u_zoomSize.value as number;
     var offset = materialRef.current.uniforms.u_offset.value as Vector2;
 
-    if (mouseDown0.current)
+    if (mouseDown0.current && isQPressed.current)
       zoom *= 1 - zoomSpeed * delta;
-    if (mouseDown1.current)
+    if (mouseDown0.current && isAPressed.current)
       zoom *= 1 + zoomSpeed * delta;
 
-    if (mouseDown0.current ||
-      mouseDown1.current) {
+    if ((mouseDown0.current && isQPressed.current) ||
+    (mouseDown0.current && isAPressed.current)) {
 
       var zoomDelta = zoom - materialRef.current.uniforms.u_zoomSize.value;
       var mouseX = mousePosition.current.x / window.innerWidth;
@@ -109,6 +164,17 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
       materialRef.current.uniforms.u_zoomSize.value = zoom;
       materialRef.current.uniforms.u_offset.value = offset;
     };
+
+    if (mouseDown1.current) {
+
+      var mouseX = mousePosition.current.x / window.innerWidth;
+      var mouseY = 1 - mousePosition.current.y / window.innerHeight;
+
+      offset = offset.add(new Vector2(-mouseDelta.current.x * zoom * 0.001, mouseDelta.current.y * zoom * 0.001));
+      materialRef.current.uniforms.u_offset.value = offset;
+    };
+
+    materialRef.current.uniforms.u_JuliaC.value = new Vector2(props.r, props.i);
 
   });
 
