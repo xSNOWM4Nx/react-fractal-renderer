@@ -5,6 +5,8 @@ The goal of this project is to render fractals on a canvas with the usgae of Web
 
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
+![](docs/react-fractal-renderer_preview.gif)
+
 ## 📦 Packages:
 - [ts-lib-module](https://github.com/xSNOWM4Nx/ts-lib-module)
 - [react-lib-module](https://github.com/xSNOWM4Nx/react-lib-module)

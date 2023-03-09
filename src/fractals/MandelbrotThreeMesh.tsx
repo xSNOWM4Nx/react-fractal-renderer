@@ -2,11 +2,12 @@ import { useRef, useState, useEffect, useMemo, useCallback } from 'react'
 import { useFrame, ThreeEvent } from '@react-three/fiber';
 import { Vector2, Vector3 } from "three";
 
-import { getDefaultUnifroms, getWindowSize, hexToVec3 } from './renderingHelpers';
+import { getDefaultUnifroms, getWindowSize, getAspectRatio, hexToVec3 } from './renderingHelpers';
 import { mandelbrot_FragmentShader } from './../shaders/fragmentShader';
 
 interface ILocalProps {
-}
+  reset: boolean;
+};
 type Props = ILocalProps;
 
 export const MandelbrotThreeMesh: React.FC<Props> = (props) => {
@@ -94,6 +95,15 @@ export const MandelbrotThreeMesh: React.FC<Props> = (props) => {
   }, []);
 
   // useEffects
+  useEffect(() => {
+ 
+    if (props.reset) {
+
+      materialRef.current.uniforms.u_zoomSize.value = startZoom;
+      materialRef.current.uniforms.u_offset.value = new Vector2(-(startZoom / 2) * getAspectRatio(), -(startZoom / 2));
+    };
+
+  }, [props.reset]);
   useEffect(() => {
     window.addEventListener("resize", updateScreenSize, false);
 

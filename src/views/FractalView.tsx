@@ -34,9 +34,6 @@ const FractalViewMemoized: React.FC<Props> = (props) => {
   if (juliaI === undefined || juliaI === 0)
     juliaI = 0.156
 
-  console.log('--------------->>>>')
-  console.log(reset)
-
   return (
 
     <React.Fragment>
@@ -59,7 +56,8 @@ const FractalViewMemoized: React.FC<Props> = (props) => {
               far={1} /> */}
             <ambientLight />
             {fractalKey === FractalKeys.MandelbrotSet &&
-              <MandelbrotThreeMesh />}
+              <MandelbrotThreeMesh
+                reset={reset}/>}
             {fractalKey === FractalKeys.JuliaSet &&
               <JuliaThreeMesh
                 reset={reset}

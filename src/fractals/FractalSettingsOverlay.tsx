@@ -20,19 +20,8 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
   // Contexts
   const systemContext = useContext(SystemContext);
 
-  const [reset, setReset] = React.useState(false);
   const [juliaSetR, setJuliaSetR] = React.useState<number>(-0.8);
   const [juliaSetI, setJuliaSetI] = React.useState<number>(0.156);
-
-  useEffect(() => {
-
-    if (reset) {
-
-      setReset(false);
-      systemContext.storeSetting(FractalSettingKeys.ResetSettings, false);
-    }
-
-  }, [reset]);
 
   const getSetting = (key: string, type: string) => {
 
@@ -48,13 +37,19 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
       return 0;
   };
 
-  const handleReset = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 
-    setReset(true);
     setJuliaSetR(-0.8);
     setJuliaSetI(0.156);
 
+    systemContext.storeSetting(FractalSettingKeys.JuliaSetR, -0.8)
+    systemContext.storeSetting(FractalSettingKeys.JuliaSetI, 0.156)
     systemContext.storeSetting(FractalSettingKeys.ResetSettings, true);
+  };
+
+  const handleMouseUp = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+
+    systemContext.storeSetting(FractalSettingKeys.ResetSettings, false);
   };
 
   const handleFractalTypeChange = (e: SelectChangeEvent) => {
@@ -156,15 +151,16 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
           </Typography>
         </Box>
 
-        {/* <Button
+        <Button
           sx={{
             marginTop: (theme) => theme.spacing(1)
           }}
           variant="contained"
-          onClick={handleReset}>
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}>
 
           {'Reset'}
-        </Button> */}
+        </Button>
 
       </React.Fragment>
     )

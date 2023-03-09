@@ -95,6 +95,15 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
 
   // useEffects
   useEffect(() => {
+ 
+    if (props.reset) {
+
+      materialRef.current.uniforms.u_zoomSize.value = startZoom;
+      materialRef.current.uniforms.u_offset.value = new Vector2(-(startZoom / 2) * getAspectRatio(), -(startZoom / 2));
+    };
+
+  }, [props.reset]);
+  useEffect(() => {
     window.addEventListener("resize", updateScreenSize, false);
 
     return () => {
@@ -145,13 +154,6 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
 
   // useFrame
   useFrame((state, delta) => {
-
-    if (props.reset) {
-
-      materialRef.current.uniforms.u_zoomSize.value = startZoom;
-      materialRef.current.uniforms.u_offset.value = new Vector2(-(startZoom / 2) * getAspectRatio(), -(startZoom / 2));
-      return;
-    };
 
     var zoom = materialRef.current.uniforms.u_zoomSize.value as number;
     var offset = materialRef.current.uniforms.u_offset.value as Vector2;
