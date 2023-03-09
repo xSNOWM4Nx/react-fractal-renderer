@@ -1,11 +1,11 @@
 /* eslint-disable react/react-in-jsx-scope -- Unaware of jsxImportSource */
 /** @jsxImportSource @emotion/react */
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { SystemContext, ScrollContainer, Indicator1 } from '@daniel.neuweiler/react-lib-module';
 
 import { FractalKeys, FractalSettingKeys } from './renderingHelpers';
 
-import { Box, Typography, FormGroup, FormControl, InputLabel, Select, MenuItem, Slider, Divider, SelectChangeEvent, useTheme, Theme, SxProps} from '@mui/material';
+import { Box, Typography, FormGroup, FormControl, Button, Select, MenuItem, Slider, Divider, SelectChangeEvent, useTheme, Theme, SxProps } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
 interface ILocalProps {
@@ -20,8 +20,19 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
   // Contexts
   const systemContext = useContext(SystemContext);
 
+  const [reset, setReset] = React.useState(false);
   const [juliaSetR, setJuliaSetR] = React.useState<number>(-0.8);
   const [juliaSetI, setJuliaSetI] = React.useState<number>(0.156);
+
+  useEffect(() => {
+
+    if (reset) {
+
+      setReset(false);
+      systemContext.storeSetting(FractalSettingKeys.ResetSettings, false);
+    }
+
+  }, [reset]);
 
   const getSetting = (key: string, type: string) => {
 
@@ -35,6 +46,15 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
       return '';
     if (type === 'number')
       return 0;
+  };
+
+  const handleReset = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+
+    setReset(true);
+    setJuliaSetR(-0.8);
+    setJuliaSetI(0.156);
+
+    systemContext.storeSetting(FractalSettingKeys.ResetSettings, true);
   };
 
   const handleFractalTypeChange = (e: SelectChangeEvent) => {
@@ -67,22 +87,105 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
     )
   };
 
+  const renderOperatingInstructions = () => {
+
+    return (
+
+      <React.Fragment>
+
+        <Box
+          component='div'
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            width: '100%'
+          }}>
+
+          <Typography
+            variant={'body2'}>
+            {'Zoom in:'}
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 'auto'
+            }}
+            variant={'body2'}>
+            {'Q + Left mouse'}
+          </Typography>
+        </Box>
+
+        <Box
+          component='div'
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            width: '100%'
+          }}>
+
+          <Typography
+            variant={'body2'}>
+            {'Zoom out:'}
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 'auto'
+            }}
+            variant={'body2'}>
+            {'A + Left mouse'}
+          </Typography>
+        </Box>
+
+        <Box
+          component='div'
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            width: '100%'
+          }}>
+
+          <Typography
+            variant={'body2'}>
+            {'Panning:'}
+          </Typography>
+          <Typography
+            sx={{
+              marginLeft: 'auto'
+            }}
+            variant={'body2'}>
+            {'Middle mouse'}
+          </Typography>
+        </Box>
+
+        {/* <Button
+          sx={{
+            marginTop: (theme) => theme.spacing(1)
+          }}
+          variant="contained"
+          onClick={handleReset}>
+
+          {'Reset'}
+        </Button> */}
+
+      </React.Fragment>
+    )
+  };
+
   const renderJuliaSettings = () => {
 
     return (
       <React.Fragment>
 
         <Box
-          sx={{height: (theme) => theme.spacing(2)}}
-          component='div'/>
+          sx={{ height: (theme) => theme.spacing(2) }}
+          component='div' />
 
         <Box
           component='div'>
-            
+
           <Typography
             id="input-slider"
             gutterBottom>
-            {'Julia r'}
+            {'r-Part (c)'}
           </Typography>
           <Slider
             min={-2}
@@ -96,16 +199,16 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
         </Box>
 
         <Box
-          sx={{height: (theme) => theme.spacing(2)}}
-          component='div'/>
+          sx={{ height: (theme) => theme.spacing(2) }}
+          component='div' />
 
         <Box
           component='div'>
-            
+
           <Typography
             id="input-slider"
             gutterBottom>
-            {'Julia i'}
+            {'i-Part (c)'}
           </Typography>
           <Slider
             min={-2}
@@ -120,7 +223,7 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
 
       </React.Fragment>
     )
-  }
+  };
 
   const renderFractalSettings = () => {
 
@@ -132,7 +235,7 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
       <ScrollContainer>
 
         <FormGroup>
-        <Typography
+          <Typography
             id="fractal-change-label-filled"
             gutterBottom>
             {'Fractal type'}
@@ -177,23 +280,27 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
     <Box
       component='div'
       sx={{
-          overflow: 'hidden',
-          position: 'relative',
-          maxHeight: 'calc(100vh - 160px)',
-          minWidth: 268,
-          width: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          alignContent: 'flex-start',
-          backgroundColor: theme.palette.background.paper,
-          borderRadius: 2,
-          boxShadow: 5,
-          opacity: 0.9,
-          padding: theme.spacing(1)
+        overflow: 'hidden',
+        position: 'relative',
+        maxHeight: 'calc(100vh - 160px)',
+        minWidth: 268,
+        width: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        alignContent: 'flex-start',
+        backgroundColor: theme.palette.background.paper,
+        borderRadius: 2,
+        boxShadow: 5,
+        opacity: 0.9,
+        padding: theme.spacing(1)
       }}>
 
-      {renderHeader()}
+      {/* {renderHeader()} */}
+      {renderOperatingInstructions()}
+      <Divider
+        flexItem={true}
+        sx={{ margin: (theme) => theme.spacing(1) }} />
       {renderFractalSettings()}
     </Box>
   );

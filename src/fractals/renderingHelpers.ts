@@ -7,6 +7,7 @@ export class FractalKeys {
 
 export class FractalSettingKeys {
   public static FractalKey = 'FractalKey';
+  public static ResetSettings = 'ResetSettings';
   public static JuliaSetR = 'JuliaSetR';
   public static JuliaSetI = 'JuliaSetI';
 };
@@ -67,5 +68,5 @@ export const hexToVec3 = (hex: string) => {
     parseInt(result[1], 16) / 255,
     parseInt(result[2], 16) / 255,
     parseInt(result[3], 16) / 255
-   ) : null;
+  ) : null;
 };

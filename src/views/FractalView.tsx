@@ -24,13 +24,18 @@ const FractalViewMemoized: React.FC<Props> = (props) => {
   var fractalKey = systemContext.getSetting(FractalSettingKeys.FractalKey) as string;
   if (fractalKey === undefined || fractalKey === '')
     fractalKey = FractalKeys.MandelbrotSet;
-
+  var reset = systemContext.getSetting(FractalSettingKeys.ResetSettings) as boolean;
+  if (reset === undefined)
+    reset = false;
   var juliaR = systemContext.getSetting(FractalSettingKeys.JuliaSetR) as number;
   if (juliaR === undefined || juliaR === 0)
     juliaR = -0.8
   var juliaI = systemContext.getSetting(FractalSettingKeys.JuliaSetI) as number;
   if (juliaI === undefined || juliaI === 0)
     juliaI = 0.156
+
+  console.log('--------------->>>>')
+  console.log(reset)
 
   return (
 
@@ -53,11 +58,13 @@ const FractalViewMemoized: React.FC<Props> = (props) => {
               near={-1}
               far={1} /> */}
             <ambientLight />
-            {fractalKey === FractalKeys.MandelbrotSet && <MandelbrotThreeMesh />}
+            {fractalKey === FractalKeys.MandelbrotSet &&
+              <MandelbrotThreeMesh />}
             {fractalKey === FractalKeys.JuliaSet &&
-            <JuliaThreeMesh
-              r={juliaR}
-              i={juliaI}/>}
+              <JuliaThreeMesh
+                reset={reset}
+                r={juliaR}
+                i={juliaI} />}
 
           </Canvas>
         } />

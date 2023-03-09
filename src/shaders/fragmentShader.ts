@@ -142,6 +142,69 @@ void main() {
 }
 `;
 
+export const koch_FragmentShader = `
+precision highp float;
+
+uniform vec2 resolution;
+uniform float time;
+
+// A function that returns the distance from a point p to a line segment defined by two points a and b
+float distToSegment(vec2 p, vec2 a, vec2 b) {
+
+  vec2 pa = p - a;
+  vec2 ba = b - a;
+  float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+  
+  return length(pa - ba * h);
+}
+
+// A function that returns the distance from a point p to the Koch curve defined by four points v0, v1, v2 and v3
+float distToKoch(vec2 p, vec2 v0, vec2 v1, vec2 v2, vec2 v3) {
+
+  float d0 = distToSegment(p, v0, v1);
+  float d1 = distToSegment(p, v1, v2);
+  float d2 = distToSegment(p, v2, v3);
+  
+  return min(min(d0,d1),d2);
+}
+
+void main() {
+
+  // Normalized pixel coordinates (from -1.0 to +1.0)
+  vec2 uv = (gl_FragCoord.xy - resolution / 2.0) / resolution.y;
+
+  // The four points that define the Koch curve
+  vec2 p0 = vec2(-0.5,-sqrt(3.0)/6.0); vec2 p1 = vec2(0.5,-sqrt(3.0)/6.0);
+
+  // The middle point of the curve
+  vec4 m4 = vec4((p4.x+p4.y)/sqrt(6.),-(p4.x-p4.y)/sqrt(6.),-p4.x/ sqrt(6.),-p4.y/ sqrt(6.) );
+  m4 = m4mat4(cos(time),sin(time),sin(time),cos(time), -sin(time),cos(time),cos(time),-sin(time), -sin(time),cos(time),-cos(time),sin(time), -cos(time),-sin(time),sin(time),cos(time));
+  vec3 m = m4.xyz/m4.w;
+  vec3 n = normalize(cross(m.xyz,m.zxy));
+  vec3 o = normalize(cross(m,n));
+  vec3 q = m+nuv.x+o*uv.y;
+
+  // The other two points of the curve
+  vec3 r = q-m;
+  float s = sqrt(r.xr.x+r.yr.y+r.z*r.z)sqrt(6.);
+  float t = atan(r.z,r.x)sqrt(6.);
+  float u = asin(r.y/sqrt(r.xr.x+r.zr.z))sqrt(6.);
+  t = t+time/10.;
+  u = u+time/10.;
+  r = svec3(cos(t)*cos(u),sin(u),sin(t)*cos(u));
+  q = m+r;
+
+  // The distance from q to each segment of the curve
+  float d = distToKoch(q.xy,p0,p1,p4,p5);
+
+  // The color based on the distance
+  vec3 col = vec3(d,d,d);
+
+  // Output to screen
+  gl_FragColor=vec4(col ,1.);
+}
+`;
+
 export const mandelbrot_2_FragmentShader = `
 // Credits go to https://medium.com/@SereneBiologist/rendering-escape-fractals-in-three-js-68c96b385a49
 

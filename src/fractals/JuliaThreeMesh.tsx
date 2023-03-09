@@ -2,12 +2,13 @@ import { useRef, useState, useEffect, useMemo, useCallback } from 'react'
 import { useFrame, ThreeEvent } from '@react-three/fiber';
 import { Vector2, Vector3 } from "three";
 
-import { getDefaultUnifroms, getWindowSize, hexToVec3 } from './renderingHelpers';
+import { getDefaultUnifroms, getWindowSize, hexToVec3, getAspectRatio } from './renderingHelpers';
 import { julia_FragmentShader } from './../shaders/fragmentShader';
 
 interface ILocalProps {
+  reset: boolean;
   r: number;
-  i: number
+  i: number;
 }
 type Props = ILocalProps;
 
@@ -79,7 +80,7 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
       isAPressed.current = true;
     if (e.code === "ControlLeft")
       isCtrlPressed.current = true;
-  
+
   }, []);
   const updateKeyUp = useCallback((e: KeyboardEvent) => {
 
@@ -89,7 +90,7 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
       isAPressed.current = false;
     if (e.code === "ControlLeft")
       isCtrlPressed.current = false;
-  
+
   }, []);
 
   // useEffects
@@ -145,6 +146,13 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
   // useFrame
   useFrame((state, delta) => {
 
+    if (props.reset) {
+
+      materialRef.current.uniforms.u_zoomSize.value = startZoom;
+      materialRef.current.uniforms.u_offset.value = new Vector2(-(startZoom / 2) * getAspectRatio(), -(startZoom / 2));
+      return;
+    };
+
     var zoom = materialRef.current.uniforms.u_zoomSize.value as number;
     var offset = materialRef.current.uniforms.u_offset.value as Vector2;
 
@@ -154,7 +162,7 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
       zoom *= 1 + zoomSpeed * delta;
 
     if ((mouseDown0.current && isQPressed.current) ||
-    (mouseDown0.current && isAPressed.current)) {
+      (mouseDown0.current && isAPressed.current)) {
 
       var zoomDelta = zoom - materialRef.current.uniforms.u_zoomSize.value;
       var mouseX = mousePosition.current.x / window.innerWidth;
