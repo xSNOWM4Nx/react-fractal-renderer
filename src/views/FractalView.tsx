@@ -6,7 +6,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrthographicCamera } from '@react-three/drei';
 import { Box } from '@mui/material';
 
-import { ViewKeys } from './navigation';
+import { ViewKeys } from './../navigation';
 import { MandelbrotThreeMesh, JuliaThreeMesh, FractalSettingsOverlay, FractalKeys, FractalSettingKeys } from './../fractals';
 
 interface ILocalProps {
@@ -57,7 +57,7 @@ const FractalViewMemoized: React.FC<Props> = (props) => {
             <ambientLight />
             {fractalKey === FractalKeys.MandelbrotSet &&
               <MandelbrotThreeMesh
-                reset={reset}/>}
+                reset={reset} />}
             {fractalKey === FractalKeys.JuliaSet &&
               <JuliaThreeMesh
                 reset={reset}
