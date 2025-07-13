@@ -1,9 +1,11 @@
 import { useRef, useState, useEffect, useMemo, useCallback } from 'react'
-import { useFrame, ThreeEvent } from '@react-three/fiber';
-import { Vector2, Vector3 } from "three";
+import { useFrame } from '@react-three/fiber';
+import { Mesh, ShaderMaterial, Vector2, Vector3 } from "three";
+import { getDefaultUnifroms, getWindowSize, getAspectRatio, hexToVec3 } from '../helpers/renderingHelpers.js';
+import { mandelbrot_FragmentShader } from './../shaders/fragmentShader.js';
 
-import { getDefaultUnifroms, getWindowSize, getAspectRatio, hexToVec3 } from './renderingHelpers';
-import { mandelbrot_FragmentShader } from './../shaders/fragmentShader';
+// Types
+import type { ThreeEvent } from '@react-three/fiber';
 
 interface ILocalProps {
   reset: boolean;
@@ -20,8 +22,8 @@ export const MandelbrotThreeMesh: React.FC<Props> = (props) => {
   const [clicked, click] = useState(false);
 
   // useRef
-  const meshRef = useRef<THREE.Mesh>(null!);
-  const materialRef = useRef<THREE.ShaderMaterial>(null!);
+  const meshRef = useRef<Mesh>(null!);
+  const materialRef = useRef<ShaderMaterial>(null!);
   const mouseDown0 = useRef(false);
   const mouseDown1 = useRef(false);
   const mouseDown2 = useRef(false);
@@ -81,7 +83,7 @@ export const MandelbrotThreeMesh: React.FC<Props> = (props) => {
       isAPressed.current = true;
     if (e.code === "ControlLeft")
       isCtrlPressed.current = true;
-  
+
   }, []);
   const updateKeyUp = useCallback((e: KeyboardEvent) => {
 
@@ -91,12 +93,12 @@ export const MandelbrotThreeMesh: React.FC<Props> = (props) => {
       isAPressed.current = false;
     if (e.code === "ControlLeft")
       isCtrlPressed.current = false;
-  
+
   }, []);
 
   // useEffects
   useEffect(() => {
- 
+
     if (props.reset) {
 
       materialRef.current.uniforms.u_zoomSize.value = startZoom;
@@ -170,7 +172,7 @@ export const MandelbrotThreeMesh: React.FC<Props> = (props) => {
       zoom *= 1 + zoomSpeed * delta;
 
     if ((mouseDown0.current && isQPressed.current) ||
-    (mouseDown0.current && isAPressed.current)) {
+      (mouseDown0.current && isAPressed.current)) {
 
       var zoomDelta = zoom - materialRef.current.uniforms.u_zoomSize.value;
       var mouseX = mousePosition.current.x / window.innerWidth;

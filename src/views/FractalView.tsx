@@ -1,17 +1,24 @@
 /* eslint-disable react/react-in-jsx-scope -- Unaware of jsxImportSource */
 /** @jsxImportSource @emotion/react */
 import React, { useContext } from 'react'
-import { SystemContext, AutoSizeContainer } from '@daniel.neuweiler/react-lib-module';
 import { Canvas } from '@react-three/fiber';
 import { OrthographicCamera } from '@react-three/drei';
 import { Box } from '@mui/material';
+import { AppContext, SettingKeys } from '../components/infrastructure/AppContextProvider.js';
+import { ViewKeys } from './viewKeys.js';
+import { ThemeKeys } from './../styles/index.js';
+import { FractalSettingsOverlay } from './../components/FractalSettingsOverlay.js';
+import { MandelbrotThreeMesh } from './../components/MandelbrotThreeMesh.js';
+import { JuliaThreeMesh } from './../components/JuliaThreeMesh.js';
+import { FractalKeys, FractalSettingKeys } from './../helpers/renderingHelpers.js';
 
-import { ViewKeys } from './../navigation';
-import { MandelbrotThreeMesh, JuliaThreeMesh, FractalSettingsOverlay, FractalKeys, FractalSettingKeys } from './../fractals';
+// Types
+import type { SelectChangeEvent } from '@mui/material';
+import type { INavigationElementProps } from '../navigation/navigationTypes.js';
 
 interface ILocalProps {
 }
-type Props = ILocalProps;
+type Props = ILocalProps & INavigationElementProps;
 
 const FractalViewMemoized: React.FC<Props> = (props) => {
 
@@ -19,34 +26,30 @@ const FractalViewMemoized: React.FC<Props> = (props) => {
   const contextName: string = ViewKeys.FractalView
 
   // Contexts
-  const systemContext = useContext(SystemContext);
+  const appContext = useContext(AppContext);
 
-  var fractalKey = systemContext.getSetting(FractalSettingKeys.FractalKey) as string;
+  var fractalKey = appContext.pullSetting(FractalSettingKeys.FractalKey) as string;
   if (fractalKey === undefined || fractalKey === '')
     fractalKey = FractalKeys.MandelbrotSet;
-  var reset = systemContext.getSetting(FractalSettingKeys.ResetSettings) as boolean;
+  var reset = appContext.pullSetting(FractalSettingKeys.ResetSettings) as boolean;
   if (reset === undefined)
     reset = false;
-  var juliaR = systemContext.getSetting(FractalSettingKeys.JuliaSetR) as number;
+  var juliaR = appContext.pullSetting(FractalSettingKeys.JuliaSetR) as number;
   if (juliaR === undefined || juliaR === 0)
     juliaR = -0.8
-  var juliaI = systemContext.getSetting(FractalSettingKeys.JuliaSetI) as number;
+  var juliaI = appContext.pullSetting(FractalSettingKeys.JuliaSetI) as number;
   if (juliaI === undefined || juliaI === 0)
     juliaI = 0.156
 
   return (
 
     <React.Fragment>
-      <AutoSizeContainer
-        isScrollLocked={false}
-        onRenderSizedChild={(height, width) =>
+      <Canvas
+        camera={{
+          fov: 10
+        }}>
 
-          <Canvas
-            camera={{
-              fov: 10
-            }}>
-
-            {/* <OrthographicCamera
+        {/* <OrthographicCamera
               makeDefault
               left={-1}
               right={1}
@@ -54,18 +57,17 @@ const FractalViewMemoized: React.FC<Props> = (props) => {
               bottom={-1}
               near={-1}
               far={1} /> */}
-            <ambientLight />
-            {fractalKey === FractalKeys.MandelbrotSet &&
-              <MandelbrotThreeMesh
-                reset={reset} />}
-            {fractalKey === FractalKeys.JuliaSet &&
-              <JuliaThreeMesh
-                reset={reset}
-                r={juliaR}
-                i={juliaI} />}
+        <ambientLight />
+        {fractalKey === FractalKeys.MandelbrotSet &&
+          <MandelbrotThreeMesh
+            reset={reset} />}
+        {fractalKey === FractalKeys.JuliaSet &&
+          <JuliaThreeMesh
+            reset={reset}
+            r={juliaR}
+            i={juliaI} />}
 
-          </Canvas>
-        } />
+      </Canvas>
 
       <Box
         component='div'

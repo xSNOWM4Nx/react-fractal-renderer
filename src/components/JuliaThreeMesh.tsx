@@ -1,9 +1,11 @@
 import { useRef, useState, useEffect, useMemo, useCallback } from 'react'
-import { useFrame, ThreeEvent } from '@react-three/fiber';
-import { Vector2, Vector3 } from "three";
+import { useFrame } from '@react-three/fiber';
+import { Mesh, ShaderMaterial, Vector2, Vector3 } from "three";
+import { getDefaultUnifroms, getWindowSize, hexToVec3, getAspectRatio } from '../helpers/renderingHelpers.js';
+import { julia_FragmentShader } from './../shaders/fragmentShader.js';
 
-import { getDefaultUnifroms, getWindowSize, hexToVec3, getAspectRatio } from './renderingHelpers';
-import { julia_FragmentShader } from './../shaders/fragmentShader';
+// Types
+import type { ThreeEvent } from '@react-three/fiber';
 
 interface ILocalProps {
   reset: boolean;
@@ -22,8 +24,8 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
   const [clicked, click] = useState(false);
 
   // useRef
-  const meshRef = useRef<THREE.Mesh>(null!);
-  const materialRef = useRef<THREE.ShaderMaterial>(null!);
+  const meshRef = useRef<Mesh>(null!);
+  const materialRef = useRef<ShaderMaterial>(null!);
   const mouseDown0 = useRef(false);
   const mouseDown1 = useRef(false);
   const mouseDown2 = useRef(false);
@@ -95,7 +97,7 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
 
   // useEffects
   useEffect(() => {
- 
+
     if (props.reset) {
 
       materialRef.current.uniforms.u_zoomSize.value = startZoom;
