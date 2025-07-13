@@ -12,9 +12,13 @@ import { MandelbrotThreeMesh } from './../components/MandelbrotThreeMesh.js';
 import { JuliaThreeMesh } from './../components/JuliaThreeMesh.js';
 import { FractalKeys, FractalSettingKeys } from './../helpers/renderingHelpers.js';
 
+// Types
+import type { SelectChangeEvent } from '@mui/material';
+import type { INavigationElementProps } from '../navigation/navigationTypes.js';
+
 interface ILocalProps {
 }
-type Props = ILocalProps;
+type Props = ILocalProps & INavigationElementProps;
 
 const FractalViewMemoized: React.FC<Props> = (props) => {
 

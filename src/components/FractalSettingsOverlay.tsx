@@ -1,8 +1,12 @@
 import React, { useContext, useEffect } from 'react';
-import { Box, Typography, FormGroup, FormControl, Button, Select, MenuItem, Slider, Divider, SelectChangeEvent, useTheme, Theme, SxProps } from '@mui/material';
+import { Box, Typography, FormGroup, FormControl, Button, Select, MenuItem, Slider, Divider, useTheme } from '@mui/material';
 import { AppContext, SettingKeys } from '../components/infrastructure/AppContextProvider.js';
-import { FractalKeys, FractalSettingKeys } from '../helpers/renderingHelpers';
+import { FractalKeys, FractalSettingKeys } from '../helpers/renderingHelpers.js';
 
+// Types
+import type { SelectChangeEvent, Theme, SxProps } from '@mui/material';
+
+// Icons
 import CloseIcon from '@mui/icons-material/Close';
 
 interface ILocalProps {

@@ -10,7 +10,7 @@ import type { INavigationElementProps } from '../navigation/navigationTypes.js';
 
 interface ILocalProps {
 }
-type Props = ILocalProps;
+type Props = ILocalProps & INavigationElementProps;
 
 const SettingsView: React.FC<Props> = (props) => {
 

@@ -1,9 +1,11 @@
 import { useRef, useState, useEffect, useMemo, useCallback } from 'react'
-import { useFrame, ThreeEvent } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { Mesh, ShaderMaterial, Vector2, Vector3 } from "three";
+import { getDefaultUnifroms, getWindowSize, getAspectRatio, hexToVec3 } from '../helpers/renderingHelpers.js';
+import { mandelbrot_FragmentShader } from './../shaders/fragmentShader.js';
 
-import { getDefaultUnifroms, getWindowSize, getAspectRatio, hexToVec3 } from '../helpers/renderingHelpers';
-import { mandelbrot_FragmentShader } from './../shaders/fragmentShader';
+// Types
+import type { ThreeEvent } from '@react-three/fiber';
 
 interface ILocalProps {
   reset: boolean;

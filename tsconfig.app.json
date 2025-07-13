@@ -8,12 +8,12 @@
       "DOM",
       "DOM.Iterable"
     ],
-    "module": "ESNext",
+    "module": "nodenext",
     "skipLibCheck": true,
     /* Bundler mode */
-    "moduleResolution": "bundler",
+    "moduleResolution": "nodenext",
     "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": false,
+    "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",

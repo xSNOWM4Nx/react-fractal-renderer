@@ -1,9 +1,11 @@
 import { useRef, useState, useEffect, useMemo, useCallback } from 'react'
-import { useFrame, ThreeEvent } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { Mesh, ShaderMaterial, Vector2, Vector3 } from "three";
+import { getDefaultUnifroms, getWindowSize, hexToVec3, getAspectRatio } from '../helpers/renderingHelpers.js';
+import { julia_FragmentShader } from './../shaders/fragmentShader.js';
 
-import { getDefaultUnifroms, getWindowSize, hexToVec3, getAspectRatio } from '../helpers/renderingHelpers';
-import { julia_FragmentShader } from './../shaders/fragmentShader';
+// Types
+import type { ThreeEvent } from '@react-three/fiber';
 
 interface ILocalProps {
   reset: boolean;
