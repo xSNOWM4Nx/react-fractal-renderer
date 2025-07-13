@@ -1,10 +1,10 @@
 import React, { useContext, useEffect } from 'react';
-import { Box, Typography, FormGroup, FormControl, Button, Select, MenuItem, Slider, Divider, useTheme } from '@mui/material';
+import { Box, Typography, FormGroup, FormControl, Button, Select, MenuItem, Slider, Divider } from '@mui/material';
 import { AppContext, SettingKeys } from '../components/infrastructure/AppContextProvider.js';
 import { FractalKeys, FractalSettingKeys } from '../helpers/renderingHelpers.js';
 
 // Types
-import type { SelectChangeEvent, Theme, SxProps } from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material';
 
 // Icons
 import CloseIcon from '@mui/icons-material/Close';
@@ -14,9 +14,6 @@ interface ILocalProps {
 type Props = ILocalProps;
 
 export const FractalSettingsOverlay: React.FC<Props> = (props) => {
-
-  // External hooks
-  const theme = useTheme();
 
   // Contexts
   const appContext = useContext(AppContext);
@@ -38,7 +35,7 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
       return 0;
   };
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleResetMouseDown = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 
     setJuliaSetR(-0.8);
     setJuliaSetI(0.156);
@@ -48,7 +45,7 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
     appContext.pushSetting(FractalSettingKeys.ResetSettings, true);
   };
 
-  const handleMouseUp = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleResetMouseUp = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 
     appContext.pushSetting(FractalSettingKeys.ResetSettings, false);
   };
@@ -67,22 +64,6 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
     appContext.pushSetting(FractalSettingKeys.JuliaSetI, newValue as number)
   };
 
-  const renderHeader = () => {
-
-    return (
-
-      <React.Fragment>
-
-        <Typography
-          variant={'h6'}
-          gutterBottom={true}>
-          {'Fractal settings'}
-        </Typography>
-
-      </React.Fragment>
-    )
-  };
-
   const renderOperatingInstructions = () => {
 
     return (
@@ -90,7 +71,6 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
       <React.Fragment>
 
         <Box
-          component='div'
           sx={{
             display: 'flex',
             flexDirection: 'row',
@@ -111,7 +91,6 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
         </Box>
 
         <Box
-          component='div'
           sx={{
             display: 'flex',
             flexDirection: 'row',
@@ -132,7 +111,6 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
         </Box>
 
         <Box
-          component='div'
           sx={{
             display: 'flex',
             flexDirection: 'row',
@@ -157,8 +135,8 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
             marginTop: (theme) => theme.spacing(1)
           }}
           variant="contained"
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}>
+          onMouseDown={handleResetMouseDown}
+          onMouseUp={handleResetMouseUp}>
 
           {'Reset'}
         </Button>
@@ -172,12 +150,9 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
     return (
       <React.Fragment>
 
-        <Box
-          sx={{ height: (theme) => theme.spacing(2) }}
-          component='div' />
+        <Box sx={{ height: (theme) => theme.spacing(2) }} />
 
-        <Box
-          component='div'>
+        <Box>
 
           <Typography
             id="input-slider"
@@ -195,12 +170,9 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
             valueLabelDisplay="auto" />
         </Box>
 
-        <Box
-          sx={{ height: (theme) => theme.spacing(2) }}
-          component='div' />
+        <Box sx={{ height: (theme) => theme.spacing(2) }} />
 
-        <Box
-          component='div'>
+        <Box>
 
           <Typography
             id="input-slider"
@@ -278,29 +250,32 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
   return (
 
     <Box
-      component='div'
-      sx={{
-        overflow: 'hidden',
-        position: 'relative',
-        maxHeight: 'calc(100vh - 160px)',
-        minWidth: 268,
-        width: 'auto',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        alignContent: 'flex-start',
-        backgroundColor: theme.palette.background.paper,
-        borderRadius: 2,
-        boxShadow: 5,
-        opacity: 0.9,
-        padding: theme.spacing(1)
+      sx={(theme) => {
+
+        return {
+          overflow: 'hidden',
+          position: 'relative',
+          maxHeight: 'calc(100vh - 160px)',
+          minWidth: 268,
+          width: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          alignContent: 'flex-start',
+          backgroundColor: theme.palette.background.paper,
+          borderRadius: 2,
+          boxShadow: 5,
+          opacity: 0.9,
+          padding: theme.spacing(1)
+        }
       }}>
 
-      {/* {renderHeader()} */}
       {renderOperatingInstructions()}
+
       <Divider
         flexItem={true}
         sx={{ margin: (theme) => theme.spacing(1) }} />
+
       {renderFractalSettings()}
     </Box>
   );
