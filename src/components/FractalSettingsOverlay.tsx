@@ -1,11 +1,8 @@
-/* eslint-disable react/react-in-jsx-scope -- Unaware of jsxImportSource */
-/** @jsxImportSource @emotion/react */
 import React, { useContext, useEffect } from 'react';
-import { SystemContext, ScrollContainer, Indicator1 } from '@daniel.neuweiler/react-lib-module';
-
-import { FractalKeys, FractalSettingKeys } from './renderingHelpers';
-
 import { Box, Typography, FormGroup, FormControl, Button, Select, MenuItem, Slider, Divider, SelectChangeEvent, useTheme, Theme, SxProps } from '@mui/material';
+import { AppContext, SettingKeys } from '../components/infrastructure/AppContextProvider.js';
+import { FractalKeys, FractalSettingKeys } from '../helpers/renderingHelpers';
+
 import CloseIcon from '@mui/icons-material/Close';
 
 interface ILocalProps {
@@ -18,14 +15,14 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
   const theme = useTheme();
 
   // Contexts
-  const systemContext = useContext(SystemContext);
+  const appContext = useContext(AppContext);
 
   const [juliaSetR, setJuliaSetR] = React.useState<number>(-0.8);
   const [juliaSetI, setJuliaSetI] = React.useState<number>(0.156);
 
   const getSetting = (key: string, type: string) => {
 
-    const value = systemContext.getSetting(key)
+    const value = appContext.pullSetting(key)
     if (typeof (value) === type)
       return value;
 
@@ -42,28 +39,28 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
     setJuliaSetR(-0.8);
     setJuliaSetI(0.156);
 
-    systemContext.storeSetting(FractalSettingKeys.JuliaSetR, -0.8)
-    systemContext.storeSetting(FractalSettingKeys.JuliaSetI, 0.156)
-    systemContext.storeSetting(FractalSettingKeys.ResetSettings, true);
+    appContext.pushSetting(FractalSettingKeys.JuliaSetR, -0.8)
+    appContext.pushSetting(FractalSettingKeys.JuliaSetI, 0.156)
+    appContext.pushSetting(FractalSettingKeys.ResetSettings, true);
   };
 
   const handleMouseUp = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 
-    systemContext.storeSetting(FractalSettingKeys.ResetSettings, false);
+    appContext.pushSetting(FractalSettingKeys.ResetSettings, false);
   };
 
   const handleFractalTypeChange = (e: SelectChangeEvent) => {
-    systemContext.storeSetting(FractalSettingKeys.FractalKey, e.target.value);
+    appContext.pushSetting(FractalSettingKeys.FractalKey, e.target.value);
   };
 
   const handleJuliaRChange = (event: Event, newValue: number | number[]) => {
     setJuliaSetR(newValue as number);
-    systemContext.storeSetting(FractalSettingKeys.JuliaSetR, newValue as number)
+    appContext.pushSetting(FractalSettingKeys.JuliaSetR, newValue as number)
   };
 
   const handleJuliaIChange = (event: Event, newValue: number | number[]) => {
     setJuliaSetI(newValue as number);
-    systemContext.storeSetting(FractalSettingKeys.JuliaSetI, newValue as number)
+    appContext.pushSetting(FractalSettingKeys.JuliaSetI, newValue as number)
   };
 
   const renderHeader = () => {
@@ -228,7 +225,10 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
       selectedFractalKey = FractalKeys.MandelbrotSet;
 
     return (
-      <ScrollContainer>
+      <Box
+        sx={{
+
+        }}>
 
         <FormGroup>
           <Typography
@@ -267,7 +267,7 @@ export const FractalSettingsOverlay: React.FC<Props> = (props) => {
 
         {selectedFractalKey === FractalKeys.JuliaSet && renderJuliaSettings()}
 
-      </ScrollContainer>
+      </Box>
     );
   };
 

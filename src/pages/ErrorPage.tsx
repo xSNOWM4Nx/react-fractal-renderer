@@ -1,6 +1,6 @@
 import React from 'react';
-import { ErrorContent } from '@daniel.neuweiler/react-lib-module';
 import { Box } from '@mui/material';
+import { ErrorContent } from '../components/infrastructure/ErrorContent.js';
 
 interface ILocalProps {
   sourceName?: string;
@@ -8,7 +8,7 @@ interface ILocalProps {
 }
 type Props = ILocalProps;
 
-export const ErrorPage: React.FC<Props> = (props) => {
+const ErrorPage: React.FC<Props> = (props) => {
 
   // Helpers
   const sourceName = (props.sourceName !== undefined) ? props.sourceName : 'Unknown';
@@ -17,7 +17,6 @@ export const ErrorPage: React.FC<Props> = (props) => {
   return (
 
     <Box
-      component='div'
       sx={{
         height: '100%',
         width: '100%',
@@ -36,3 +35,5 @@ export const ErrorPage: React.FC<Props> = (props) => {
     </Box>
   );
 }
+
+export default ErrorPage;

@@ -1,18 +1,16 @@
 import { useRef, useState, useEffect, useMemo, useCallback } from 'react'
 import { useFrame, ThreeEvent } from '@react-three/fiber';
-import { Vector2, Vector3 } from "three";
+import { Mesh, ShaderMaterial, Vector2, Vector3 } from "three";
 
-import { getDefaultUnifroms, getWindowSize, hexToVec3, getAspectRatio } from './renderingHelpers';
-import { julia_FragmentShader } from './../shaders/fragmentShader';
+import { getDefaultUnifroms, getWindowSize, getAspectRatio, hexToVec3 } from '../helpers/renderingHelpers';
+import { mandelbrot_FragmentShader } from './../shaders/fragmentShader';
 
 interface ILocalProps {
   reset: boolean;
-  r: number;
-  i: number;
-}
+};
 type Props = ILocalProps;
 
-export const JuliaThreeMesh: React.FC<Props> = (props) => {
+export const MandelbrotThreeMesh: React.FC<Props> = (props) => {
 
   const startZoom = 2;
   const zoomSpeed = 1;
@@ -22,8 +20,8 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
   const [clicked, click] = useState(false);
 
   // useRef
-  const meshRef = useRef<THREE.Mesh>(null!);
-  const materialRef = useRef<THREE.ShaderMaterial>(null!);
+  const meshRef = useRef<Mesh>(null!);
+  const materialRef = useRef<ShaderMaterial>(null!);
   const mouseDown0 = useRef(false);
   const mouseDown1 = useRef(false);
   const mouseDown2 = useRef(false);
@@ -36,9 +34,6 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
   const uniforms = useMemo(
     () => ({
       ...getDefaultUnifroms(startZoom),
-      u_JuliaC: {
-        value: new Vector2(props.r, props.i), // (-0.4, 0.6), (0.285, 0), (-0.8, 0.156)
-      },
       u_baseColor: {
         value: new Vector3(0.15, 0.15, 0.15),
       },
@@ -56,7 +51,13 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
       },
       u_color5: {
         value: hexToVec3('#64b5f6'),
-      }
+      },
+      pset1: {
+        value: new Vector3(1, .01, .01),
+      },
+      pset2: {
+        value: new Vector3(.01, .01, .01),
+      },
     }), []
   );
 
@@ -95,7 +96,7 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
 
   // useEffects
   useEffect(() => {
- 
+
     if (props.reset) {
 
       materialRef.current.uniforms.u_zoomSize.value = startZoom;
@@ -131,6 +132,11 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
       window.removeEventListener("keyup", updateKeyUp, false);
     };
   }, [updateKeyUp]);
+
+  const handlePointerMove = (e: ThreeEvent<PointerEvent>) => {
+
+    mousePosition.current = { x: e.clientX, y: e.clientY };
+  };
 
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
 
@@ -184,8 +190,6 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
       materialRef.current.uniforms.u_offset.value = offset;
     };
 
-    materialRef.current.uniforms.u_JuliaC.value = new Vector2(props.r, props.i);
-
   });
 
   return (
@@ -193,7 +197,9 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
     <mesh
       {...props}
       ref={meshRef}
+      // scale={clicked ? 1.5 : 1}
       onClick={(event) => click(!clicked)}
+      // onPointerMove={handlePointerMove}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerOver={(event) => hover(true)}
@@ -203,7 +209,7 @@ export const JuliaThreeMesh: React.FC<Props> = (props) => {
       <shaderMaterial
         ref={materialRef}
         uniforms={uniforms}
-        fragmentShader={julia_FragmentShader} />
+        fragmentShader={mandelbrot_FragmentShader} />
     </mesh>
 
   );

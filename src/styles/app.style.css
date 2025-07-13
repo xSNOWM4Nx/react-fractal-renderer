@@ -1,3 +1,24 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-size: 62.5%;
+  /* 62.5% of 16px = 10px */
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes genericRotating {
+  0% {
+    transform: rotate(calc(0deg + calc(var(--offsetFactor) * var(--offsetDegree)))) translate(0px, 128px) rotate(calc(0deg - calc(var(--offsetFactor) * var(--offsetDegree))));
+  }
+
+  100% {
+    transform: rotate(calc(360deg + calc(var(--offsetFactor) * var(--offsetDegree)))) translate(0px, 128px) rotate(calc(-360deg - calc(var(--offsetFactor) * var(--offsetDegree))));
+  }
+}
+
 .red {
   background: red;
 }

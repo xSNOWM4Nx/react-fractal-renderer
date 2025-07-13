@@ -1,9 +1,12 @@
 import React, { useContext } from 'react';
-import { Box, Typography, Card, CardContent, FormGroup, FormControl, FormControlLabel, InputLabel, Switch, Select, SelectChangeEvent, MenuItem } from '@mui/material';
-import { SystemContext, ViewContainer } from '@daniel.neuweiler/react-lib-module';
-import { AppContext } from './../contexts';
-import { ViewKeys } from './../navigation';
-import { ThemeKeys } from './../styles';
+import { Box, Typography, Card, CardContent, FormGroup, FormControl, FormControlLabel, InputLabel, Switch, Select, MenuItem } from '@mui/material';
+import { AppContext, SettingKeys } from '../components/infrastructure/AppContextProvider.js';
+import { ViewKeys } from './viewKeys.js';
+import { ThemeKeys } from './../styles/index.js';
+
+// Types
+import type { SelectChangeEvent } from '@mui/material';
+import type { INavigationElementProps } from '../navigation/navigationTypes.js';
 
 interface ILocalProps {
 }
@@ -15,10 +18,18 @@ const SettingsView: React.FC<Props> = (props) => {
   const contextName: string = ViewKeys.SettingsView;
 
   // Contexts
-  const systemContext = useContext(SystemContext);
   const appContext = useContext(AppContext);
 
-  const handleChange = (e: SelectChangeEvent) => {
+  const pullSetting = (key: string, type: string) => {
+
+    const value = appContext.pullSetting(key);
+    if (typeof (value) === type)
+      return value;
+
+    return false;
+  };
+
+  const handleThemeChange = (e: SelectChangeEvent) => {
     appContext.changeTheme(e.target.value);
   };
 
@@ -49,7 +60,7 @@ const SettingsView: React.FC<Props> = (props) => {
                 labelId="theme-change-label-filled"
                 id="theme-change-select-filled"
                 value={appContext.activeThemeName}
-                onChange={handleChange}>
+                onChange={handleThemeChange}>
 
                 <MenuItem
                   value={ThemeKeys.DarkTheme}>
@@ -70,16 +81,19 @@ const SettingsView: React.FC<Props> = (props) => {
 
   return (
 
-    <ViewContainer
-      isScrollLocked={true}>
+    <Box
+      sx={{
+        height: '100%',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
 
       {renderAppSettings()}
 
-      <Box
-        component='div'
-        sx={{ height: (theme) => theme.spacing(1) }} />
+      <Box sx={{ height: (theme) => theme.spacing(1) }} />
 
-    </ViewContainer>
+    </Box>
   );
 }
 
