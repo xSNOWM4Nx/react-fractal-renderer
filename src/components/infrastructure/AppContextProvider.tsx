@@ -2,14 +2,10 @@ import React, { useRef, useState, useEffect } from 'react';
 import { ThemeKeys } from '../../styles/index.js';
 
 export class SettingKeys {
-  public static EnablePathPrediction = 'EnablePathPrediction';
-  public static ShowDataOverlayOnMap = 'ShowDataOverlayOnMap';
 };
 
 const getDefaultSettings = () => {
   return {
-    [SettingKeys.EnablePathPrediction]: true,
-    [SettingKeys.ShowDataOverlayOnMap]: true
   };
 };
 
