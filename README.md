@@ -7,6 +7,9 @@ The goal of this project is to render fractals on a canvas with the usgae of Web
 
 ![](docs/react-fractal-renderer_preview.gif)
 
+## 🎮 Try it
+[DEMO](https://xsnowm4nx.github.io/react-fractal-renderer/)
+
 ## 📦 Packages:
 - [react-three-fiber](https://www.npmjs.com/package/@react-three/fiber)
 - [MUI](https://www.npmjs.com/package/@mui/material)

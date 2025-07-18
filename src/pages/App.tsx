@@ -63,7 +63,8 @@ const App: React.FC = () => {
 
   return (
 
-    <BrowserRouter>
+    <BrowserRouter
+      basename="/react-fractal-renderer">
       <ThemeProvider
         theme={getTheme()}>
 

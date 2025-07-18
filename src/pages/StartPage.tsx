@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box } from '@mui/material';
 import { useNavigation } from '../components/infrastructure/NavigationProvider.js';
 import NavigationElementInjector from '../components/infrastructure/NavigationElementInjector.js';
 import { getImportableView } from '../navigation/navigationElements.js';
+import { ViewKeys } from '../views/viewKeys.js';
 
 interface ILocalProps {
 }
@@ -14,7 +15,12 @@ const StartPage: React.FC<Props> = (props) => {
   const contextName: string = 'StartPage'
 
   // Hooks
-  const { currentViewElement } = useNavigation();
+  const { navigateByKey, currentViewElement } = useNavigation();
+
+  // Effects
+  useEffect(() => {
+    navigateByKey(ViewKeys.FractalView);
+  }, []);
 
   if (currentViewElement === null || currentViewElement === undefined)
     return null;
